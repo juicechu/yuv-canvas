@@ -33,7 +33,8 @@ module.exports = function(grunt) {
     browserify: {
       demo: {
         files: {
-          'docs/demo-bundled.js': ['docs/demo.js']
+          'docs/demo-bundled.js': ['docs/demo.js'],
+          'player/main-bundled.js': ['player/player.js', 'player/main.js']
         },
         options: {
           transform: [[require('aliasify'), {
@@ -43,13 +44,33 @@ module.exports = function(grunt) {
           }]]
         }
       }
+    },
+    watch: {
+      scripts: {
+        files: ['player/*.js', '!player/*-bundled.js', 'src/*.js'],
+        tasks: ['default'],
+        options: {
+          livereload: true
+        }
+      }
+    },
+    connect: {
+      server: {
+        options: {
+          livereload: true,
+          base: 'player/',
+          port: 8081
+        }
+      }
     }
   });
 
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-text-replace');
   grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-contrib-connect');
 
   grunt.registerTask('default', ['eslint', 'replace', 'browserify']);
-
+  grunt.registerTask('serve', ['default', 'connect:server', 'watch']);
 };
